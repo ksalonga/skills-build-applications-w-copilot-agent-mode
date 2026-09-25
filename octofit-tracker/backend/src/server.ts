@@ -3,7 +3,12 @@ import express from 'express';
 import cors from 'cors';
 
 import './config/database.js';
-import apiRouter, { apiBaseUrl } from './routes/api.js';
+import apiRouter from './routes/api.js';
+
+const codespaceName = process.env.CODESPACE_NAME;
+const apiBaseUrl = codespaceName
+  ? `https://${codespaceName}-8000.app.github.dev`
+  : 'http://localhost:8000';
 
 const app = express();
 const port = Number(process.env.PORT ?? 8000);

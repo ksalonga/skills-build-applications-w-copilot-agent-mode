@@ -9,6 +9,8 @@ const sanitizeDocument = (doc) => {
     const sanitized = { ...doc };
     delete sanitized._id;
     delete sanitized.__v;
+    delete sanitized.createdAt;
+    delete sanitized.updatedAt;
     return sanitized;
 };
 router.get('/health', (_req, res) => {

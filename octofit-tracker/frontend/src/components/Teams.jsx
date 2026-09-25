@@ -1,6 +1,10 @@
 import { useEffect, useState } from 'react';
 
-import { buildApiUrl, normalizeDataResponse } from '../utils/api.js';
+const codespaceName = import.meta.env.VITE_CODESPACE_NAME;
+const apiBaseUrl = codespaceName
+  ? `https://${codespaceName}-8000.app.github.dev`
+  : 'http://localhost:8000';
+const teamsApiUrl = `${apiBaseUrl}/api/teams/`;
 
 export default function Teams() {
   const [teams, setTeams] = useState([]);
@@ -10,7 +14,7 @@ export default function Teams() {
   useEffect(() => {
     let ignore = false;
 
-    fetch(buildApiUrl('teams'))
+    fetch(teamsApiUrl)
       .then((response) => {
         if (!response.ok) {
           throw new Error(`Request failed with status ${response.status}`);
@@ -18,8 +22,14 @@ export default function Teams() {
         return response.json();
       })
       .then((payload) => {
+        const nextTeams = Array.isArray(payload)
+          ? payload
+          : Array.isArray(payload?.data)
+            ? payload.data
+            : [];
+
         if (!ignore) {
-          setTeams(normalizeDataResponse(payload));
+          setTeams(nextTeams);
         }
       })
       .catch((fetchError) => {

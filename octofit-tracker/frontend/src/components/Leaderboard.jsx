@@ -1,6 +1,10 @@
 import { useEffect, useState } from 'react';
 
-import { buildApiUrl, normalizeDataResponse } from '../utils/api.js';
+const codespaceName = import.meta.env.VITE_CODESPACE_NAME;
+const apiBaseUrl = codespaceName
+  ? `https://${codespaceName}-8000.app.github.dev`
+  : 'http://localhost:8000';
+const leaderboardApiUrl = `${apiBaseUrl}/api/leaderboard/`;
 
 export default function Leaderboard() {
   const [entries, setEntries] = useState([]);
@@ -10,7 +14,7 @@ export default function Leaderboard() {
   useEffect(() => {
     let ignore = false;
 
-    fetch(buildApiUrl('leaderboard'))
+    fetch(leaderboardApiUrl)
       .then((response) => {
         if (!response.ok) {
           throw new Error(`Request failed with status ${response.status}`);
@@ -18,8 +22,14 @@ export default function Leaderboard() {
         return response.json();
       })
       .then((payload) => {
+        const nextEntries = Array.isArray(payload)
+          ? payload
+          : Array.isArray(payload?.data)
+            ? payload.data
+            : [];
+
         if (!ignore) {
-          setEntries(normalizeDataResponse(payload));
+          setEntries(nextEntries);
         }
       })
       .catch((fetchError) => {

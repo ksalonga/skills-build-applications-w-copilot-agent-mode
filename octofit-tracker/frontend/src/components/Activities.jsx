@@ -1,6 +1,10 @@
 import { useEffect, useState } from 'react';
 
-import { buildApiUrl, normalizeDataResponse } from '../utils/api.js';
+const codespaceName = import.meta.env.VITE_CODESPACE_NAME;
+const apiBaseUrl = codespaceName
+  ? `https://${codespaceName}-8000.app.github.dev`
+  : 'http://localhost:8000';
+const activitiesApiUrl = `${apiBaseUrl}/api/activities/`;
 
 export default function Activities() {
   const [activities, setActivities] = useState([]);
@@ -10,7 +14,7 @@ export default function Activities() {
   useEffect(() => {
     let ignore = false;
 
-    fetch(buildApiUrl('activities'))
+    fetch(activitiesApiUrl)
       .then((response) => {
         if (!response.ok) {
           throw new Error(`Request failed with status ${response.status}`);
@@ -18,8 +22,14 @@ export default function Activities() {
         return response.json();
       })
       .then((payload) => {
+        const nextActivities = Array.isArray(payload)
+          ? payload
+          : Array.isArray(payload?.data)
+            ? payload.data
+            : [];
+
         if (!ignore) {
-          setActivities(normalizeDataResponse(payload));
+          setActivities(nextActivities);
         }
       })
       .catch((fetchError) => {

@@ -1,6 +1,10 @@
 import { useEffect, useState } from 'react';
 
-import { buildApiUrl, normalizeDataResponse } from '../utils/api.js';
+const codespaceName = import.meta.env.VITE_CODESPACE_NAME;
+const apiBaseUrl = codespaceName
+  ? `https://${codespaceName}-8000.app.github.dev`
+  : 'http://localhost:8000';
+const workoutsApiUrl = `${apiBaseUrl}/api/workouts/`;
 
 export default function Workouts() {
   const [workouts, setWorkouts] = useState([]);
@@ -10,7 +14,7 @@ export default function Workouts() {
   useEffect(() => {
     let ignore = false;
 
-    fetch(buildApiUrl('workouts'))
+    fetch(workoutsApiUrl)
       .then((response) => {
         if (!response.ok) {
           throw new Error(`Request failed with status ${response.status}`);
@@ -18,8 +22,14 @@ export default function Workouts() {
         return response.json();
       })
       .then((payload) => {
+        const nextWorkouts = Array.isArray(payload)
+          ? payload
+          : Array.isArray(payload?.data)
+            ? payload.data
+            : [];
+
         if (!ignore) {
-          setWorkouts(normalizeDataResponse(payload));
+          setWorkouts(nextWorkouts);
         }
       })
       .catch((fetchError) => {

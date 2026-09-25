@@ -1,6 +1,10 @@
 import { useEffect, useState } from 'react';
 
-import { buildApiUrl, normalizeDataResponse } from '../utils/api.js';
+const codespaceName = import.meta.env.VITE_CODESPACE_NAME;
+const apiBaseUrl = codespaceName
+  ? `https://${codespaceName}-8000.app.github.dev`
+  : 'http://localhost:8000';
+const usersApiUrl = `${apiBaseUrl}/api/users/`;
 
 export default function Users() {
   const [users, setUsers] = useState([]);
@@ -10,7 +14,7 @@ export default function Users() {
   useEffect(() => {
     let ignore = false;
 
-    fetch(buildApiUrl('users'))
+    fetch(usersApiUrl)
       .then((response) => {
         if (!response.ok) {
           throw new Error(`Request failed with status ${response.status}`);
@@ -18,8 +22,14 @@ export default function Users() {
         return response.json();
       })
       .then((payload) => {
+        const nextUsers = Array.isArray(payload)
+          ? payload
+          : Array.isArray(payload?.data)
+            ? payload.data
+            : [];
+
         if (!ignore) {
-          setUsers(normalizeDataResponse(payload));
+          setUsers(nextUsers);
         }
       })
       .catch((fetchError) => {

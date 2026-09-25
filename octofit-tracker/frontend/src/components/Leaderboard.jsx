@@ -1,10 +1,8 @@
 import { useEffect, useState } from 'react';
 
-const codespaceName = import.meta.env.VITE_CODESPACE_NAME;
-const apiBaseUrl = codespaceName
-  ? `https://${codespaceName}-8000.app.github.dev`
-  : 'http://localhost:8000';
-const leaderboardApiUrl = `${apiBaseUrl}/api/leaderboard/`;
+const leaderboardApiUrl = import.meta.env.VITE_CODESPACE_NAME
+  ? `https://${import.meta.env.VITE_CODESPACE_NAME}-8000.app.github.dev/api/leaderboard/`
+  : 'http://localhost:8000/api/leaderboard/';
 
 export default function Leaderboard() {
   const [entries, setEntries] = useState([]);

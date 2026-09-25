@@ -23,3 +23,4 @@ const baseUrl = codespaceName
 - Use Mongoose models for users, teams, activities, leaderboard, and workouts.
 - Connect to `octofit_db`.
 - Validate endpoints with `curl` after wiring routes.
+

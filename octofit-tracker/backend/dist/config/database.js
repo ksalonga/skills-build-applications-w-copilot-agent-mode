@@ -1,6 +1,14 @@
+import 'dotenv/config';
 import mongoose from 'mongoose';
 const connectionString = process.env.MONGODB_URI || 'mongodb://localhost:27017/octofit_db';
 const db = mongoose.connection;
+export const connectDatabase = async () => {
+    if (db.readyState === 1) {
+        return db;
+    }
+    await mongoose.connect(connectionString);
+    return db;
+};
 mongoose
     .connect(connectionString)
     .then(() => {
